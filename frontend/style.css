@@ -871,8 +871,8 @@ body {
     position: absolute;
     top: var(--space-lg);
     right: var(--space-lg);
-    width: 44px;
-    height: 44px;
+    width: 22px;
+    height: 22px;
     background: var(--bg-surface);
     border: 1px solid var(--border-default);
     border-radius: var(--radius-md);
@@ -1110,7 +1110,7 @@ body {
     .theme-toggle {
         top: var(--space-md);
         right: var(--space-md);
-        width: 40px;
-        height: 40px;
+        width: 20px;
+        height: 20px;
     }
 }
