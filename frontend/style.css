@@ -863,3 +863,254 @@ body {
     font-style: italic;
     padding: var(--space-sm);
 }
+
+/* ========================================
+   Theme Toggle Button
+   ======================================== */
+.theme-toggle {
+    position: absolute;
+    top: var(--space-lg);
+    right: var(--space-lg);
+    width: 44px;
+    height: 44px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    transition: all var(--transition-base);
+    overflow: hidden;
+}
+
+.theme-toggle:hover {
+    background: var(--bg-elevated);
+    border-color: var(--accent);
+    transform: scale(1.05);
+}
+
+.theme-toggle:active {
+    transform: scale(0.95);
+}
+
+.theme-toggle:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.theme-toggle:focus-visible {
+    box-shadow: 0 0 0 3px var(--accent-soft), 0 0 0 5px var(--accent);
+}
+
+/* Theme icons */
+.theme-icon {
+    position: absolute;
+    color: var(--text-secondary);
+    transition: all var(--transition-slow);
+}
+
+.theme-toggle:hover .theme-icon {
+    color: var(--accent);
+}
+
+/* Sun icon - visible in dark mode (default) */
+.sun-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+/* Moon icon - hidden in dark mode (default) */
+.moon-icon {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.5);
+}
+
+/* Light mode icon states */
+[data-theme="light"] .sun-icon {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.5);
+}
+
+[data-theme="light"] .moon-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+/* ========================================
+   Light Theme Variables
+   ======================================== */
+[data-theme="light"] {
+    /* Colors - Warm light palette */
+    --bg-deep: #fafaf9;
+    --bg-base: #f5f5f4;
+    --bg-surface: #ffffff;
+    --bg-elevated: #e7e5e4;
+    --bg-hover: #d6d3d1;
+
+    /* Accent remains the same warm amber */
+    --accent: #d97706;
+    --accent-soft: rgba(217, 119, 6, 0.12);
+    --accent-glow: rgba(217, 119, 6, 0.25);
+
+    /* Text */
+    --text-primary: #1c1917;
+    --text-secondary: #57534e;
+    --text-muted: #78716c;
+
+    /* Borders */
+    --border-subtle: rgba(87, 83, 78, 0.1);
+    --border-default: rgba(87, 83, 78, 0.15);
+    --border-strong: rgba(87, 83, 78, 0.25);
+
+    /* Shadows - lighter for light mode */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.15);
+    --shadow-glow: 0 0 40px var(--accent-glow);
+}
+
+/* Light mode specific overrides */
+
+/* User message - ensure white text on amber gradient */
+[data-theme="light"] .message.user .message-content {
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--accent) 0%, #b45309 100%);
+}
+
+/* Code blocks - subtle gray background */
+[data-theme="light"] .message-content code {
+    background: rgba(28, 25, 23, 0.06);
+    color: #92400e;
+}
+
+[data-theme="light"] .message-content pre {
+    background: rgba(28, 25, 23, 0.04);
+    border: 1px solid var(--border-subtle);
+}
+
+[data-theme="light"] .message-content pre code {
+    color: var(--text-primary);
+}
+
+/* Sidebar decorative gradient */
+[data-theme="light"] .sidebar::before {
+    background: linear-gradient(180deg, rgba(217, 119, 6, 0.06) 0%, transparent 100%);
+}
+
+/* Main area grid pattern */
+[data-theme="light"] .chat-main::before {
+    background-image:
+        linear-gradient(rgba(87, 83, 78, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(87, 83, 78, 0.04) 1px, transparent 1px);
+}
+
+/* Send button - darker amber for better contrast */
+[data-theme="light"] #sendButton {
+    background: var(--accent);
+    color: #ffffff;
+}
+
+[data-theme="light"] #sendButton:hover:not(:disabled) {
+    background: #b45309;
+}
+
+/* Input focus glow */
+[data-theme="light"] .chat-input-container:focus-within {
+    box-shadow: 0 0 0 3px var(--accent-soft), 0 0 20px var(--accent-glow);
+}
+
+/* Sources section */
+[data-theme="light"] .sources-collapsible summary {
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
+}
+
+[data-theme="light"] .sources-collapsible summary:hover {
+    background: var(--bg-hover);
+}
+
+[data-theme="light"] .sources-content {
+    background: var(--bg-elevated);
+}
+
+[data-theme="light"] .source-link {
+    background: var(--bg-surface);
+    border-color: var(--border-default);
+}
+
+/* Loading animation - darker dots for visibility */
+[data-theme="light"] .loading span {
+    background: var(--accent);
+}
+
+/* Scrollbar for light mode */
+[data-theme="light"] .chat-messages::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+}
+
+[data-theme="light"] .chat-messages::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* Welcome message styling */
+[data-theme="light"] .message.welcome-message .message-content {
+    background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-elevated) 100%);
+    border: 1px solid var(--border-default);
+}
+
+/* Links in messages */
+[data-theme="light"] .message-content a {
+    color: #b45309;
+}
+
+[data-theme="light"] .message-content a:hover {
+    color: var(--accent);
+}
+
+/* Blockquotes */
+[data-theme="light"] .message-content blockquote {
+    border-left-color: var(--accent);
+    background: rgba(217, 119, 6, 0.05);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+/* Brand icon in sidebar */
+[data-theme="light"] .brand-icon {
+    background: rgba(217, 119, 6, 0.1);
+}
+
+/* New chat button hover */
+[data-theme="light"] .new-chat-btn:hover {
+    background: var(--bg-elevated);
+    border-color: var(--accent);
+}
+
+/* Suggested cards */
+[data-theme="light"] .suggested-card {
+    background: var(--bg-surface);
+    box-shadow: var(--shadow-sm);
+}
+
+[data-theme="light"] .suggested-card:hover {
+    background: var(--bg-surface);
+    box-shadow: var(--shadow-md);
+}
+
+/* Theme toggle button in light mode */
+[data-theme="light"] .theme-toggle {
+    background: var(--bg-surface);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Responsive adjustments for theme toggle */
+@media (max-width: 768px) {
+    .theme-toggle {
+        top: var(--space-md);
+        right: var(--space-md);
+        width: 40px;
+        height: 40px;
+    }
+}
