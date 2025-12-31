@@ -7,75 +7,136 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Course Materials Assistant</title>
-    <link rel="stylesheet" href="style.css?v=9">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Course Materials Assistant</h1>
-            <p class="subtitle">Ask questions about courses, instructors, and content</p>
-        </header>
+    <div class="app-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+                        <path d="M8 7h6"/>
+                        <path d="M8 11h8"/>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-title">Course Assistant</span>
+                    <span class="brand-subtitle">Knowledge at your fingertips</span>
+                </div>
+            </div>
 
-        <div class="main-content">
-            <!-- Left Sidebar -->
-            <aside class="sidebar">
-                <!-- Course Stats -->
-                <div class="sidebar-section">
-                    <details class="stats-collapsible">
-                        <summary class="stats-header">Courses</summary>
-                        <div class="course-stats" id="courseStats">
-                            <div class="stat-item">
-                                <span class="stat-label">Number of courses:</span>
-                                <span class="stat-value" id="totalCourses">-</span>
-                            </div>
-                            <div class="stat-item">
-                                <div class="course-titles" id="courseTitles">
-                                    <span class="loading">Loading...</span>
-                                </div>
-                            </div>
+            <!-- New Chat Button -->
+            <div class="sidebar-section new-chat-section">
+                <button class="new-chat-btn" id="newChatBtn">
+                    <span class="new-chat-icon">+</span>
+                    <span class="new-chat-text">New Chat</span>
+                </button>
+            </div>
+
+            <!-- Course Stats -->
+            <div class="sidebar-section">
+                <details class="sidebar-details" open>
+                    <summary class="sidebar-summary">
+                        <span class="summary-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                                <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                            </svg>
+                        </span>
+                        <span class="summary-text">Library</span>
+                        <span class="summary-badge" id="totalCourses">-</span>
+                    </summary>
+                    <div class="sidebar-content">
+                        <div class="course-list" id="courseTitles">
+                            <div class="course-item loading-shimmer">Loading courses...</div>
                         </div>
-                    </details>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Suggested Questions -->
+            <div class="sidebar-section">
+                <details class="sidebar-details" open>
+                    <summary class="sidebar-summary">
+                        <span class="summary-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            </svg>
+                        </span>
+                        <span class="summary-text">Quick Start</span>
+                    </summary>
+                    <div class="sidebar-content">
+                        <div class="suggested-grid">
+                            <button class="suggested-card" data-question="What is the outline of the &quot;MCP: Build Rich-Context AI Apps with Anthropic&quot; course?">
+                                <span class="card-icon">📚</span>
+                                <span class="card-text">Course outline</span>
+                            </button>
+                            <button class="suggested-card" data-question="Are there any courses that include a Chatbot implementation?">
+                                <span class="card-icon">🤖</span>
+                                <span class="card-text">Chatbot courses</span>
+                            </button>
+                            <button class="suggested-card" data-question="Are there any courses that explain what RAG is?">
+                                <span class="card-icon">🔍</span>
+                                <span class="card-text">Learn about RAG</span>
+                            </button>
+                            <button class="suggested-card" data-question="What was covered in lesson 5 of the MCP course?">
+                                <span class="card-icon">📖</span>
+                                <span class="card-text">Lesson details</span>
+                            </button>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="footer-hint">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 16v-4"/>
+                        <path d="M12 8h.01"/>
+                    </svg>
+                    <span>Press Enter to send</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-main">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h1>What would you like to learn?</h1>
+                    <p>Ask questions about courses, lessons, and specific content</p>
                 </div>
 
-                <!-- Suggested Questions -->
-                <div class="sidebar-section">
-                    <details class="suggested-collapsible">
-                        <summary class="suggested-header">Try asking:</summary>
-                        <div class="suggested-items">
-                            <button class="suggested-item" data-question="What is the outline of the &quot;MCP: Build Rich-Context AI Apps with Anthropic&quot; course?">Outline of a course</button>
-                            <button class="suggested-item" data-question="Are there any courses that include a Chatbot implementation?">Courses about Chatbot</button>
-                            <button class="suggested-item" data-question="Are there any courses that explain what RAG is?">Courses explaining RAG</button>
-                            <button class="suggested-item" data-question="What was covered in lesson 5 of the MCP course?">Details of a course's lesson</button>
-                        </div>
-                    </details>
-                </div>
-            </aside>
+                <div id="chatMessages" class="chat-messages"></div>
 
-            <!-- Main Chat Area -->
-            <main class="chat-main">
-                <div class="chat-container">
-                    <div id="chatMessages" class="chat-messages"></div>
+                <div class="chat-input-wrapper">
                     <div class="chat-input-container">
-                        <input 
-                            type="text" 
-                            id="chatInput" 
-                            placeholder="Ask about courses, lessons, or specific content..."
+                        <div class="input-glow"></div>
+                        <input
+                            type="text"
+                            id="chatInput"
+                            placeholder="Ask anything about your courses..."
                             autocomplete="off"
                         >
-                        <button id="sendButton">
+                        <button id="sendButton" aria-label="Send message">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="22" y1="2" x2="11" y2="13"></line>
-                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                <path d="M5 12h14"/>
+                                <path d="m12 5 7 7-7 7"/>
                             </svg>
                         </button>
                     </div>
                 </div>
-            </main>
-        </div>
+            </div>
+        </main>
     </div>
 
-
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="script.js?v=9"></script>
+    <script src="script.js?v=10"></script>
 </body>
 </html>

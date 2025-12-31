@@ -28,12 +28,16 @@ function setupEventListeners() {
     chatInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') sendMessage();
     });
-    
-    
-    // Suggested questions
-    document.querySelectorAll('.suggested-item').forEach(button => {
+
+    // New chat button
+    const newChatBtn = document.getElementById('newChatBtn');
+    newChatBtn.addEventListener('click', createNewSession);
+
+    // Suggested questions (card grid)
+    document.querySelectorAll('.suggested-card').forEach(button => {
         button.addEventListener('click', (e) => {
-            const question = e.target.getAttribute('data-question');
+            const card = e.target.closest('.suggested-card');
+            const question = card.getAttribute('data-question');
             chatInput.value = question;
             sendMessage();
         });
@@ -122,10 +126,18 @@ function addMessage(content, type, sources = null, isWelcome = false) {
     let html = `<div class="message-content">${displayContent}</div>`;
     
     if (sources && sources.length > 0) {
+        const sourceLinks = sources.map(s => {
+            const text = s.lesson !== null ? `${s.title} - Lesson ${s.lesson}` : s.title;
+            if (s.url) {
+                return `<a href="${escapeHtml(s.url)}" target="_blank" rel="noopener" class="source-link">${escapeHtml(text)}</a>`;
+            }
+            return `<span class="source-link">${escapeHtml(text)}</span>`;
+        }).join('');
+
         html += `
             <details class="sources-collapsible">
-                <summary class="sources-header">Sources</summary>
-                <div class="sources-content">${sources.join(', ')}</div>
+                <summary>Sources</summary>
+                <div class="sources-content">${sourceLinks}</div>
             </details>
         `;
     }
