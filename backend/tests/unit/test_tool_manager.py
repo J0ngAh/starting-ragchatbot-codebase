@@ -7,6 +7,7 @@ Tests evaluate:
 3. Tool execution dispatch
 4. Source tracking and reset
 """
+
 import sys
 from pathlib import Path
 from unittest.mock import MagicMock
@@ -16,7 +17,7 @@ import pytest
 # Add backend to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from search_tools import ToolManager, Tool
+from search_tools import Tool, ToolManager
 
 
 class MockTool(Tool):
@@ -32,7 +33,7 @@ class MockTool(Tool):
         return {
             "name": self._name,
             "description": f"Mock tool: {self._name}",
-            "input_schema": {"type": "object", "properties": {}}
+            "input_schema": {"type": "object", "properties": {}},
         }
 
     def execute(self, **kwargs):

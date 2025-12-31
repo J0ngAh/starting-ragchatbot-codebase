@@ -14,12 +14,20 @@ A RAG (Retrieval-Augmented Generation) chatbot for querying course materials. Us
 # Install dependencies
 uv sync
 
+# Install dev dependencies (includes black, isort, ruff)
+uv sync --extra dev
+
 # Run the application (starts server at http://localhost:8000)
 ./run.sh
 # Or manually:
 cd backend && uv run uvicorn app:app --reload --port 8000
 
 # API docs available at http://localhost:8000/docs
+
+# Code Quality
+./scripts/format.sh   # Format code with black and isort
+./scripts/lint.sh     # Run linting checks (ruff, black --check, isort --check)
+./scripts/quality.sh  # Run all quality checks (format + lint + tests)
 ```
 
 ## Architecture

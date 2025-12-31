@@ -7,23 +7,21 @@ Tests evaluate:
 3. Source population after searches
 4. Direct response path (no tool use)
 """
+
 import sys
 from pathlib import Path
-from unittest.mock import MagicMock, patch, Mock
-
-import pytest
+from unittest.mock import MagicMock, patch
 
 # Add backend and tests to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from search_tools import ToolManager, CourseSearchTool, CourseOutlineTool
-from vector_store import SearchResults
 from helpers import (
-    build_search_results,
     build_claude_text_response,
-    build_claude_tool_use_response
+    build_claude_tool_use_response,
+    build_search_results,
 )
+from search_tools import CourseOutlineTool, CourseSearchTool, ToolManager
 
 
 class TestSearchToolExecutionFlow:
@@ -39,7 +37,7 @@ class TestSearchToolExecutionFlow:
         mock_vs = MagicMock()
         mock_vs.search.return_value = build_search_results(
             documents=["Neural networks are machine learning models."],
-            metadata=[{"course_title": "ML Basics", "lesson_number": 1}]
+            metadata=[{"course_title": "ML Basics", "lesson_number": 1}],
         )
         mock_vs.get_lesson_link.return_value = "https://example.com/ml/1"
 
@@ -50,15 +48,12 @@ class TestSearchToolExecutionFlow:
 
         # Execute tool through manager (simulating what AIGenerator does)
         result = tool_manager.execute_tool(
-            "search_course_content",
-            query="neural networks"
+            "search_course_content", query="neural networks"
         )
 
         # Verify VectorStore.search was called
         mock_vs.search.assert_called_once_with(
-            query="neural networks",
-            course_name=None,
-            lesson_number=None
+            query="neural networks", course_name=None, lesson_number=None
         )
 
         # Verify result is formatted correctly
@@ -76,7 +71,7 @@ class TestSearchToolExecutionFlow:
         mock_vs = MagicMock()
         mock_vs.search.return_value = build_search_results(
             documents=["Python content here."],
-            metadata=[{"course_title": "Python 101", "lesson_number": 2}]
+            metadata=[{"course_title": "Python 101", "lesson_number": 2}],
         )
         mock_vs.get_lesson_link.return_value = "https://example.com/py/2"
 
@@ -85,16 +80,12 @@ class TestSearchToolExecutionFlow:
         tool_manager.register_tool(search_tool)
 
         result = tool_manager.execute_tool(
-            "search_course_content",
-            query="basics",
-            course_name="Python"
+            "search_course_content", query="basics", course_name="Python"
         )
 
         # Verify course filter was passed
         mock_vs.search.assert_called_once_with(
-            query="basics",
-            course_name="Python",
-            lesson_number=None
+            query="basics", course_name="Python", lesson_number=None
         )
 
     def test_search_tool_with_lesson_filter(self):
@@ -102,7 +93,7 @@ class TestSearchToolExecutionFlow:
         mock_vs = MagicMock()
         mock_vs.search.return_value = build_search_results(
             documents=["Lesson 3 content."],
-            metadata=[{"course_title": "Course", "lesson_number": 3}]
+            metadata=[{"course_title": "Course", "lesson_number": 3}],
         )
         mock_vs.get_lesson_link.return_value = "https://example.com/3"
 
@@ -111,9 +102,7 @@ class TestSearchToolExecutionFlow:
         tool_manager.register_tool(search_tool)
 
         tool_manager.execute_tool(
-            "search_course_content",
-            query="test",
-            lesson_number=3
+            "search_course_content", query="test", lesson_number=3
         )
 
         call_kwargs = mock_vs.search.call_args.kwargs
@@ -130,19 +119,24 @@ class TestOutlineToolExecutionFlow:
             "title": "Machine Learning Course",
             "course_link": "https://example.com/ml",
             "lessons": [
-                {"lesson_number": 0, "lesson_title": "Introduction", "lesson_link": "http://1"},
-                {"lesson_number": 1, "lesson_title": "Basics", "lesson_link": "http://2"},
-            ]
+                {
+                    "lesson_number": 0,
+                    "lesson_title": "Introduction",
+                    "lesson_link": "http://1",
+                },
+                {
+                    "lesson_number": 1,
+                    "lesson_title": "Basics",
+                    "lesson_link": "http://2",
+                },
+            ],
         }
 
         tool_manager = ToolManager()
         outline_tool = CourseOutlineTool(mock_vs)
         tool_manager.register_tool(outline_tool)
 
-        result = tool_manager.execute_tool(
-            "get_course_outline",
-            course_name="ML"
-        )
+        result = tool_manager.execute_tool("get_course_outline", course_name="ML")
 
         mock_vs.get_course_outline.assert_called_once_with("ML")
         assert "Machine Learning Course" in result
@@ -159,8 +153,7 @@ class TestOutlineToolExecutionFlow:
         tool_manager.register_tool(outline_tool)
 
         result = tool_manager.execute_tool(
-            "get_course_outline",
-            course_name="NonExistent"
+            "get_course_outline", course_name="NonExistent"
         )
 
         assert "No course found" in result
@@ -170,7 +163,7 @@ class TestOutlineToolExecutionFlow:
 class TestToolResultsToAI:
     """Tests for passing tool results back to Claude."""
 
-    @patch('ai_generator.anthropic.Anthropic')
+    @patch("ai_generator.anthropic.Anthropic")
     def test_tool_results_included_in_follow_up_call(self, mock_anthropic_class):
         """Verify tool results are passed back to Claude for synthesis."""
         from ai_generator import AIGenerator
@@ -181,7 +174,7 @@ class TestToolResultsToAI:
         tool_response = build_claude_tool_use_response(
             tool_name="search_course_content",
             tool_input={"query": "machine learning"},
-            tool_id="tool_abc"
+            tool_id="tool_abc",
         )
 
         # Second response: Final synthesized answer
@@ -196,7 +189,7 @@ class TestToolResultsToAI:
         mock_vs = MagicMock()
         mock_vs.search.return_value = build_search_results(
             documents=["ML is a subset of AI."],
-            metadata=[{"course_title": "ML Course", "lesson_number": 1}]
+            metadata=[{"course_title": "ML Course", "lesson_number": 1}],
         )
         mock_vs.get_lesson_link.return_value = "https://ml.com/1"
 
@@ -208,9 +201,7 @@ class TestToolResultsToAI:
 
         generator = AIGenerator(api_key="test", model="test")
         result = generator.generate_response(
-            query="What is ML?",
-            tools=tools,
-            tool_manager=tool_manager
+            query="What is ML?", tools=tools, tool_manager=tool_manager
         )
 
         # Verify second API call includes tool result
@@ -238,7 +229,7 @@ class TestToolResultsToAI:
 class TestNoToolUsePath:
     """Tests for direct response path (no tool use)."""
 
-    @patch('ai_generator.anthropic.Anthropic')
+    @patch("ai_generator.anthropic.Anthropic")
     def test_direct_response_without_tool_use(self, mock_anthropic_class):
         """Verify direct response when Claude doesn't use tools."""
         from ai_generator import AIGenerator
@@ -258,9 +249,7 @@ class TestNoToolUsePath:
 
         generator = AIGenerator(api_key="test", model="test")
         result = generator.generate_response(
-            query="What is Python?",
-            tools=tools,
-            tool_manager=tool_manager
+            query="What is Python?", tools=tools, tool_manager=tool_manager
         )
 
         # Only one API call
@@ -272,7 +261,7 @@ class TestNoToolUsePath:
         # Direct response returned
         assert result == "Python is a programming language."
 
-    @patch('ai_generator.anthropic.Anthropic')
+    @patch("ai_generator.anthropic.Anthropic")
     def test_no_sources_for_direct_response(self, mock_anthropic_class):
         """Verify no sources tracked when no tool is used."""
         from ai_generator import AIGenerator
@@ -292,9 +281,7 @@ class TestNoToolUsePath:
 
         generator = AIGenerator(api_key="test", model="test")
         generator.generate_response(
-            query="What is 2+2?",
-            tools=tools,
-            tool_manager=tool_manager
+            query="What is 2+2?", tools=tools, tool_manager=tool_manager
         )
 
         # Sources should be empty
@@ -312,12 +299,12 @@ class TestSourcePopulation:
             documents=["Content 1", "Content 2"],
             metadata=[
                 {"course_title": "Course A", "lesson_number": 1},
-                {"course_title": "Course B", "lesson_number": 2}
-            ]
+                {"course_title": "Course B", "lesson_number": 2},
+            ],
         )
         mock_vs.get_lesson_link.side_effect = [
             "https://coursea.com/1",
-            "https://courseb.com/2"
+            "https://courseb.com/2",
         ]
 
         tool_manager = ToolManager()
@@ -341,7 +328,7 @@ class TestSourcePopulation:
         mock_vs = MagicMock()
         mock_vs.search.return_value = build_search_results(
             documents=["Content"],
-            metadata=[{"course_title": "Course", "lesson_number": 1}]
+            metadata=[{"course_title": "Course", "lesson_number": 1}],
         )
         mock_vs.get_lesson_link.return_value = "https://example.com"
 
@@ -361,9 +348,7 @@ class TestSourcePopulation:
         """Verify sources are empty when search returns no results."""
         mock_vs = MagicMock()
         mock_vs.search.return_value = build_search_results(
-            documents=[],
-            metadata=[],
-            distances=[]
+            documents=[], metadata=[], distances=[]
         )
 
         tool_manager = ToolManager()
@@ -403,13 +388,13 @@ class TestMultipleToolRegistration:
         mock_vs = MagicMock()
         mock_vs.search.return_value = build_search_results(
             documents=["Search result"],
-            metadata=[{"course_title": "C", "lesson_number": 1}]
+            metadata=[{"course_title": "C", "lesson_number": 1}],
         )
         mock_vs.get_lesson_link.return_value = "http://test"
         mock_vs.get_course_outline.return_value = {
             "title": "Outline Course",
             "course_link": "http://outline",
-            "lessons": []
+            "lessons": [],
         }
 
         tool_manager = ToolManager()
@@ -419,15 +404,11 @@ class TestMultipleToolRegistration:
         tool_manager.register_tool(outline_tool)
 
         # Execute search
-        search_result = tool_manager.execute_tool(
-            "search_course_content",
-            query="test"
-        )
+        search_result = tool_manager.execute_tool("search_course_content", query="test")
         assert "Search result" in search_result
 
         # Execute outline
         outline_result = tool_manager.execute_tool(
-            "get_course_outline",
-            course_name="test"
+            "get_course_outline", course_name="test"
         )
         assert "Outline Course" in outline_result

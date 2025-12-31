@@ -6,10 +6,9 @@ Tests evaluate:
 2. is_empty method
 3. Attribute storage
 """
+
 import sys
 from pathlib import Path
-
-import pytest
 
 # Add backend to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -25,7 +24,7 @@ class TestSearchResultsCreation:
         results = SearchResults(
             documents=["doc1", "doc2"],
             metadata=[{"key": "val1"}, {"key": "val2"}],
-            distances=[0.3, 0.5]
+            distances=[0.3, 0.5],
         )
 
         assert len(results.documents) == 2
@@ -35,21 +34,14 @@ class TestSearchResultsCreation:
     def test_create_with_error(self):
         """Verify creation with error message."""
         results = SearchResults(
-            documents=[],
-            metadata=[],
-            distances=[],
-            error="Something went wrong"
+            documents=[], metadata=[], distances=[], error="Something went wrong"
         )
 
         assert results.error == "Something went wrong"
 
     def test_error_defaults_to_none(self):
         """Verify error is None by default."""
-        results = SearchResults(
-            documents=["doc"],
-            metadata=[{}],
-            distances=[0.1]
-        )
+        results = SearchResults(documents=["doc"], metadata=[{}], distances=[0.1])
 
         assert results.error is None
 
@@ -62,7 +54,7 @@ class TestSearchResultsFromChroma:
         chroma_results = {
             "documents": [["doc1", "doc2"]],
             "metadatas": [[{}, {}]],
-            "distances": [[0.3, 0.5]]
+            "distances": [[0.3, 0.5]],
         }
 
         results = SearchResults.from_chroma(chroma_results)
@@ -74,7 +66,7 @@ class TestSearchResultsFromChroma:
         chroma_results = {
             "documents": [["doc"]],
             "metadatas": [[{"course_title": "ML", "lesson_number": 1}]],
-            "distances": [[0.3]]
+            "distances": [[0.3]],
         }
 
         results = SearchResults.from_chroma(chroma_results)
@@ -87,7 +79,7 @@ class TestSearchResultsFromChroma:
         chroma_results = {
             "documents": [["doc1", "doc2"]],
             "metadatas": [[{}, {}]],
-            "distances": [[0.25, 0.75]]
+            "distances": [[0.25, 0.75]],
         }
 
         results = SearchResults.from_chroma(chroma_results)
@@ -96,11 +88,7 @@ class TestSearchResultsFromChroma:
 
     def test_from_chroma_handles_empty_results(self):
         """Verify empty ChromaDB results are handled."""
-        chroma_results = {
-            "documents": [],
-            "metadatas": [],
-            "distances": []
-        }
+        chroma_results = {"documents": [], "metadatas": [], "distances": []}
 
         results = SearchResults.from_chroma(chroma_results)
 
@@ -110,11 +98,7 @@ class TestSearchResultsFromChroma:
 
     def test_from_chroma_handles_none_in_nested_arrays(self):
         """Verify handling of nested empty arrays."""
-        chroma_results = {
-            "documents": [[]],
-            "metadatas": [[]],
-            "distances": [[]]
-        }
+        chroma_results = {"documents": [[]], "metadatas": [[]], "distances": [[]]}
 
         results = SearchResults.from_chroma(chroma_results)
 
@@ -149,20 +133,14 @@ class TestSearchResultsIsEmpty:
 
     def test_is_empty_true_when_no_documents(self):
         """Verify is_empty returns True for empty documents."""
-        results = SearchResults(
-            documents=[],
-            metadata=[],
-            distances=[]
-        )
+        results = SearchResults(documents=[], metadata=[], distances=[])
 
         assert results.is_empty() is True
 
     def test_is_empty_false_when_documents_present(self):
         """Verify is_empty returns False when documents exist."""
         results = SearchResults(
-            documents=["some content"],
-            metadata=[{}],
-            distances=[0.5]
+            documents=["some content"], metadata=[{}], distances=[0.5]
         )
 
         assert results.is_empty() is False
@@ -176,9 +154,7 @@ class TestSearchResultsIsEmpty:
     def test_is_empty_single_document(self):
         """Verify is_empty is False with single document."""
         results = SearchResults(
-            documents=["single doc"],
-            metadata=[{"key": "value"}],
-            distances=[0.1]
+            documents=["single doc"], metadata=[{"key": "value"}], distances=[0.1]
         )
 
         assert results.is_empty() is False
@@ -190,9 +166,7 @@ class TestSearchResultsAttributes:
     def test_documents_accessible(self):
         """Verify documents attribute is accessible."""
         results = SearchResults(
-            documents=["content here"],
-            metadata=[{}],
-            distances=[0.0]
+            documents=["content here"], metadata=[{}], distances=[0.0]
         )
 
         assert results.documents[0] == "content here"
@@ -200,20 +174,14 @@ class TestSearchResultsAttributes:
     def test_metadata_accessible(self):
         """Verify metadata attribute is accessible."""
         results = SearchResults(
-            documents=["doc"],
-            metadata=[{"title": "Test Course"}],
-            distances=[0.0]
+            documents=["doc"], metadata=[{"title": "Test Course"}], distances=[0.0]
         )
 
         assert results.metadata[0]["title"] == "Test Course"
 
     def test_distances_accessible(self):
         """Verify distances attribute is accessible."""
-        results = SearchResults(
-            documents=["doc"],
-            metadata=[{}],
-            distances=[0.42]
-        )
+        results = SearchResults(documents=["doc"], metadata=[{}], distances=[0.42])
 
         assert results.distances[0] == 0.42
 
@@ -223,10 +191,6 @@ class TestSearchResultsAttributes:
         meta = [{"i": 0}, {"i": 1}, {"i": 2}]
         dist = [0.1, 0.2, 0.3]
 
-        results = SearchResults(
-            documents=docs,
-            metadata=meta,
-            distances=dist
-        )
+        results = SearchResults(documents=docs, metadata=meta, distances=dist)
 
         assert len(results.documents) == len(results.metadata) == len(results.distances)

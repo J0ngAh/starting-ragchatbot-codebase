@@ -2,11 +2,11 @@
 Helper functions for building mock objects in tests.
 These can be imported directly unlike conftest.py fixtures.
 """
-from unittest.mock import Mock
-from typing import List, Dict, Any, Optional
 
 import sys
 from pathlib import Path
+from typing import Any
+from unittest.mock import Mock
 
 # Add backend to path for imports
 backend_path = Path(__file__).parent.parent
@@ -16,42 +16,37 @@ from vector_store import SearchResults
 
 
 def build_search_results(
-    documents: List[str],
-    metadata: List[Dict[str, Any]],
-    distances: Optional[List[float]] = None,
-    error: Optional[str] = None
+    documents: list[str],
+    metadata: list[dict[str, Any]],
+    distances: list[float] | None = None,
+    error: str | None = None,
 ) -> SearchResults:
     """Create SearchResults for testing."""
     if distances is None:
         distances = [0.5] * len(documents)
     return SearchResults(
-        documents=documents,
-        metadata=metadata,
-        distances=distances,
-        error=error
+        documents=documents, metadata=metadata, distances=distances, error=error
     )
 
 
 def build_empty_search_results(error_msg: str = None) -> SearchResults:
     """Create empty SearchResults."""
-    return SearchResults.empty(error_msg) if error_msg else SearchResults(
-        documents=[], metadata=[], distances=[]
+    return (
+        SearchResults.empty(error_msg)
+        if error_msg
+        else SearchResults(documents=[], metadata=[], distances=[])
     )
 
 
 def build_chroma_results(
-    documents: List[str],
-    metadata: List[Dict[str, Any]],
-    distances: Optional[List[float]] = None
-) -> Dict:
+    documents: list[str],
+    metadata: list[dict[str, Any]],
+    distances: list[float] | None = None,
+) -> dict:
     """Build mock ChromaDB query results format."""
     if distances is None:
         distances = [0.5] * len(documents)
-    return {
-        "documents": [documents],
-        "metadatas": [metadata],
-        "distances": [distances]
-    }
+    return {"documents": [documents], "metadatas": [metadata], "distances": [distances]}
 
 
 def build_claude_text_response(text: str) -> Mock:
@@ -68,9 +63,7 @@ def build_claude_text_response(text: str) -> Mock:
 
 
 def build_claude_tool_use_response(
-    tool_name: str,
-    tool_input: Dict[str, Any],
-    tool_id: str = "tool_123"
+    tool_name: str, tool_input: dict[str, Any], tool_id: str = "tool_123"
 ) -> Mock:
     """Create mock Claude response requesting tool use."""
     tool_block = Mock()
@@ -87,10 +80,7 @@ def build_claude_tool_use_response(
 
 
 def build_claude_mixed_response(
-    text: str,
-    tool_name: str,
-    tool_input: Dict[str, Any],
-    tool_id: str = "tool_123"
+    text: str, tool_name: str, tool_input: dict[str, Any], tool_id: str = "tool_123"
 ) -> Mock:
     """Create mock Claude response with both text and tool use."""
     text_block = Mock()

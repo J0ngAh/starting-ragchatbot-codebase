@@ -1,11 +1,11 @@
 """
 Shared fixtures and mock builders for RAG chatbot tests.
 """
+
 import sys
 from pathlib import Path
+from typing import Any
 from unittest.mock import MagicMock, Mock
-from dataclasses import dataclass
-from typing import List, Dict, Any, Optional
 
 import pytest
 
@@ -13,51 +13,46 @@ import pytest
 backend_path = Path(__file__).parent.parent
 sys.path.insert(0, str(backend_path))
 
+from models import Course, CourseChunk, Lesson
 from vector_store import SearchResults
-from models import Course, Lesson, CourseChunk
-
 
 # =============================================================================
 # Mock Response Builders
 # =============================================================================
 
+
 def build_search_results(
-    documents: List[str],
-    metadata: List[Dict[str, Any]],
-    distances: Optional[List[float]] = None,
-    error: Optional[str] = None
+    documents: list[str],
+    metadata: list[dict[str, Any]],
+    distances: list[float] | None = None,
+    error: str | None = None,
 ) -> SearchResults:
     """Create SearchResults for testing."""
     if distances is None:
         distances = [0.5] * len(documents)
     return SearchResults(
-        documents=documents,
-        metadata=metadata,
-        distances=distances,
-        error=error
+        documents=documents, metadata=metadata, distances=distances, error=error
     )
 
 
 def build_empty_search_results(error_msg: str = None) -> SearchResults:
     """Create empty SearchResults."""
-    return SearchResults.empty(error_msg) if error_msg else SearchResults(
-        documents=[], metadata=[], distances=[]
+    return (
+        SearchResults.empty(error_msg)
+        if error_msg
+        else SearchResults(documents=[], metadata=[], distances=[])
     )
 
 
 def build_chroma_results(
-    documents: List[str],
-    metadata: List[Dict[str, Any]],
-    distances: Optional[List[float]] = None
-) -> Dict:
+    documents: list[str],
+    metadata: list[dict[str, Any]],
+    distances: list[float] | None = None,
+) -> dict:
     """Build mock ChromaDB query results format."""
     if distances is None:
         distances = [0.5] * len(documents)
-    return {
-        "documents": [documents],
-        "metadatas": [metadata],
-        "distances": [distances]
-    }
+    return {"documents": [documents], "metadatas": [metadata], "distances": [distances]}
 
 
 def build_claude_text_response(text: str) -> Mock:
@@ -74,9 +69,7 @@ def build_claude_text_response(text: str) -> Mock:
 
 
 def build_claude_tool_use_response(
-    tool_name: str,
-    tool_input: Dict[str, Any],
-    tool_id: str = "tool_123"
+    tool_name: str, tool_input: dict[str, Any], tool_id: str = "tool_123"
 ) -> Mock:
     """Create mock Claude response requesting tool use."""
     tool_block = Mock()
@@ -93,10 +86,7 @@ def build_claude_tool_use_response(
 
 
 def build_claude_mixed_response(
-    text: str,
-    tool_name: str,
-    tool_input: Dict[str, Any],
-    tool_id: str = "tool_123"
+    text: str, tool_name: str, tool_input: dict[str, Any], tool_id: str = "tool_123"
 ) -> Mock:
     """Create mock Claude response with both text and tool use."""
     text_block = Mock()
@@ -120,6 +110,7 @@ def build_claude_mixed_response(
 # Sample Data Fixtures
 # =============================================================================
 
+
 @pytest.fixture
 def sample_course():
     """Sample Course object for testing."""
@@ -131,19 +122,19 @@ def sample_course():
             Lesson(
                 lesson_number=0,
                 title="Introduction",
-                lesson_link="https://example.com/ml/0"
+                lesson_link="https://example.com/ml/0",
             ),
             Lesson(
                 lesson_number=1,
                 title="Supervised Learning",
-                lesson_link="https://example.com/ml/1"
+                lesson_link="https://example.com/ml/1",
             ),
             Lesson(
                 lesson_number=2,
                 title="Neural Networks",
-                lesson_link="https://example.com/ml/2"
+                lesson_link="https://example.com/ml/2",
             ),
-        ]
+        ],
     )
 
 
@@ -155,19 +146,19 @@ def sample_course_chunks(sample_course):
             content="This is content about machine learning basics.",
             course_title=sample_course.title,
             lesson_number=0,
-            chunk_index=0
+            chunk_index=0,
         ),
         CourseChunk(
             content="Supervised learning involves labeled data.",
             course_title=sample_course.title,
             lesson_number=1,
-            chunk_index=1
+            chunk_index=1,
         ),
         CourseChunk(
             content="Neural networks are inspired by the brain.",
             course_title=sample_course.title,
             lesson_number=2,
-            chunk_index=2
+            chunk_index=2,
         ),
     ]
 
@@ -194,6 +185,7 @@ def sample_search_documents():
 # Mock VectorStore Fixture
 # =============================================================================
 
+
 @pytest.fixture
 def mock_vector_store(sample_search_documents, sample_search_metadata):
     """Mock VectorStore with configurable search results."""
@@ -203,7 +195,7 @@ def mock_vector_store(sample_search_documents, sample_search_metadata):
     default_results = build_search_results(
         documents=sample_search_documents,
         metadata=sample_search_metadata,
-        distances=[0.3, 0.5]
+        distances=[0.3, 0.5],
     )
     mock_store.search.return_value = default_results
 
@@ -215,9 +207,17 @@ def mock_vector_store(sample_search_documents, sample_search_metadata):
         "title": "Introduction to ML",
         "course_link": "https://example.com/ml",
         "lessons": [
-            {"lesson_number": 0, "lesson_title": "Introduction", "lesson_link": "https://example.com/ml/0"},
-            {"lesson_number": 1, "lesson_title": "Basics", "lesson_link": "https://example.com/ml/1"},
-        ]
+            {
+                "lesson_number": 0,
+                "lesson_title": "Introduction",
+                "lesson_link": "https://example.com/ml/0",
+            },
+            {
+                "lesson_number": 1,
+                "lesson_title": "Basics",
+                "lesson_link": "https://example.com/ml/1",
+            },
+        ],
     }
 
     return mock_store
@@ -239,13 +239,16 @@ def mock_vector_store_empty():
 def mock_vector_store_error():
     """Mock VectorStore that returns error results."""
     mock_store = MagicMock()
-    mock_store.search.return_value = SearchResults.empty("Search error: connection failed")
+    mock_store.search.return_value = SearchResults.empty(
+        "Search error: connection failed"
+    )
     return mock_store
 
 
 # =============================================================================
 # Mock Anthropic Client Fixture
 # =============================================================================
+
 
 @pytest.fixture
 def mock_anthropic_client():
@@ -268,7 +271,7 @@ def mock_anthropic_client_tool_use():
     tool_response = build_claude_tool_use_response(
         tool_name="search_course_content",
         tool_input={"query": "neural networks"},
-        tool_id="tool_abc123"
+        tool_id="tool_abc123",
     )
 
     # Second call (after tool execution) returns final text
@@ -284,6 +287,7 @@ def mock_anthropic_client_tool_use():
 # =============================================================================
 # Mock Config Fixture
 # =============================================================================
+
 
 @pytest.fixture
 def mock_config():
@@ -304,6 +308,7 @@ def mock_config():
 # Tool Manager Fixtures
 # =============================================================================
 
+
 @pytest.fixture
 def mock_tool_manager():
     """Mock ToolManager for testing."""
@@ -317,13 +322,15 @@ def mock_tool_manager():
                 "properties": {
                     "query": {"type": "string"},
                     "course_name": {"type": "string"},
-                    "lesson_number": {"type": "integer"}
+                    "lesson_number": {"type": "integer"},
                 },
-                "required": ["query"]
-            }
+                "required": ["query"],
+            },
         }
     ]
-    mock_tm.execute_tool.return_value = "[Introduction to ML - Lesson 1]\nThis is about neural networks."
+    mock_tm.execute_tool.return_value = (
+        "[Introduction to ML - Lesson 1]\nThis is about neural networks."
+    )
     mock_tm.get_last_sources.return_value = [
         {"title": "Introduction to ML", "lesson": 1, "url": "https://example.com/ml/1"}
     ]
@@ -334,6 +341,7 @@ def mock_tool_manager():
 # =============================================================================
 # Session Manager Fixtures
 # =============================================================================
+
 
 @pytest.fixture
 def mock_session_manager():

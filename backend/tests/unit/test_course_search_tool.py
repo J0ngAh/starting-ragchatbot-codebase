@@ -8,19 +8,17 @@ Tests evaluate:
 4. Source tracking
 5. Parameter passing to VectorStore
 """
+
 import sys
 from pathlib import Path
-from unittest.mock import MagicMock
-
-import pytest
 
 # Add backend and tests to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from helpers import build_search_results
 from search_tools import CourseSearchTool
 from vector_store import SearchResults
-from helpers import build_search_results, build_empty_search_results
 
 
 class TestCourseSearchToolDefinition:
@@ -87,7 +85,7 @@ class TestCourseSearchToolExecuteSuccess:
         mock_vector_store.search.return_value = build_search_results(
             documents=["Content about neural networks."],
             metadata=[{"course_title": "ML Course", "lesson_number": 1}],
-            distances=[0.3]
+            distances=[0.3],
         )
 
         tool = CourseSearchTool(mock_vector_store)
@@ -102,9 +100,9 @@ class TestCourseSearchToolExecuteSuccess:
             documents=["First result content.", "Second result content."],
             metadata=[
                 {"course_title": "Course A", "lesson_number": 1},
-                {"course_title": "Course B", "lesson_number": 2}
+                {"course_title": "Course B", "lesson_number": 2},
             ],
-            distances=[0.3, 0.5]
+            distances=[0.3, 0.5],
         )
 
         tool = CourseSearchTool(mock_vector_store)
@@ -119,7 +117,7 @@ class TestCourseSearchToolExecuteSuccess:
         """Verify course title appears in header."""
         mock_vector_store.search.return_value = build_search_results(
             documents=["Some content."],
-            metadata=[{"course_title": "Advanced Python", "lesson_number": None}]
+            metadata=[{"course_title": "Advanced Python", "lesson_number": None}],
         )
 
         tool = CourseSearchTool(mock_vector_store)
@@ -131,7 +129,7 @@ class TestCourseSearchToolExecuteSuccess:
         """Verify lesson number appears in header when available."""
         mock_vector_store.search.return_value = build_search_results(
             documents=["Lesson content."],
-            metadata=[{"course_title": "ML Basics", "lesson_number": 3}]
+            metadata=[{"course_title": "ML Basics", "lesson_number": 3}],
         )
 
         tool = CourseSearchTool(mock_vector_store)
@@ -144,7 +142,7 @@ class TestCourseSearchToolExecuteSuccess:
         """Verify header format when lesson_number is None."""
         mock_vector_store.search.return_value = build_search_results(
             documents=["Content without lesson."],
-            metadata=[{"course_title": "General Course", "lesson_number": None}]
+            metadata=[{"course_title": "General Course", "lesson_number": None}],
         )
 
         tool = CourseSearchTool(mock_vector_store)
@@ -157,28 +155,36 @@ class TestCourseSearchToolExecuteSuccess:
 class TestCourseSearchToolExecuteEmpty:
     """Tests for empty result handling."""
 
-    def test_execute_returns_no_content_message_when_empty(self, mock_vector_store_empty):
+    def test_execute_returns_no_content_message_when_empty(
+        self, mock_vector_store_empty
+    ):
         """Verify empty results return appropriate message."""
         tool = CourseSearchTool(mock_vector_store_empty)
         result = tool.execute(query="nonexistent topic")
 
         assert "No relevant content found" in result
 
-    def test_execute_empty_includes_course_filter_in_message(self, mock_vector_store_empty):
+    def test_execute_empty_includes_course_filter_in_message(
+        self, mock_vector_store_empty
+    ):
         """Verify course filter mentioned in empty result message."""
         tool = CourseSearchTool(mock_vector_store_empty)
         result = tool.execute(query="test", course_name="Python Basics")
 
         assert "course 'Python Basics'" in result
 
-    def test_execute_empty_includes_lesson_filter_in_message(self, mock_vector_store_empty):
+    def test_execute_empty_includes_lesson_filter_in_message(
+        self, mock_vector_store_empty
+    ):
         """Verify lesson filter mentioned in empty result message."""
         tool = CourseSearchTool(mock_vector_store_empty)
         result = tool.execute(query="test", lesson_number=5)
 
         assert "lesson 5" in result
 
-    def test_execute_empty_includes_both_filters_in_message(self, mock_vector_store_empty):
+    def test_execute_empty_includes_both_filters_in_message(
+        self, mock_vector_store_empty
+    ):
         """Verify both filters mentioned when both provided."""
         tool = CourseSearchTool(mock_vector_store_empty)
         result = tool.execute(query="test", course_name="ML", lesson_number=2)
@@ -254,7 +260,7 @@ class TestCourseSearchToolSourceTracking:
         """Verify last_sources is populated with correct structure."""
         mock_vector_store.search.return_value = build_search_results(
             documents=["Content here."],
-            metadata=[{"course_title": "Test Course", "lesson_number": 1}]
+            metadata=[{"course_title": "Test Course", "lesson_number": 1}],
         )
         mock_vector_store.get_lesson_link.return_value = "https://example.com/lesson/1"
 
@@ -273,8 +279,8 @@ class TestCourseSearchToolSourceTracking:
             documents=["Doc 1", "Doc 2"],
             metadata=[
                 {"course_title": "Course A", "lesson_number": 1},
-                {"course_title": "Course B", "lesson_number": 2}
-            ]
+                {"course_title": "Course B", "lesson_number": 2},
+            ],
         )
 
         tool = CourseSearchTool(mock_vector_store)
@@ -283,11 +289,13 @@ class TestCourseSearchToolSourceTracking:
         # Should be called twice, once for each result
         assert mock_vector_store.get_lesson_link.call_count == 2
 
-    def test_execute_does_not_call_get_lesson_link_when_lesson_is_none(self, mock_vector_store):
+    def test_execute_does_not_call_get_lesson_link_when_lesson_is_none(
+        self, mock_vector_store
+    ):
         """Verify URL lookup is skipped when lesson_number is None."""
         mock_vector_store.search.return_value = build_search_results(
             documents=["Doc 1"],
-            metadata=[{"course_title": "Course A", "lesson_number": None}]
+            metadata=[{"course_title": "Course A", "lesson_number": None}],
         )
 
         tool = CourseSearchTool(mock_vector_store)
@@ -300,7 +308,7 @@ class TestCourseSearchToolSourceTracking:
         """Verify sources are replaced on each execute call."""
         mock_vector_store.search.return_value = build_search_results(
             documents=["First doc"],
-            metadata=[{"course_title": "First Course", "lesson_number": 1}]
+            metadata=[{"course_title": "First Course", "lesson_number": 1}],
         )
 
         tool = CourseSearchTool(mock_vector_store)
@@ -312,7 +320,7 @@ class TestCourseSearchToolSourceTracking:
         # Change mock response
         mock_vector_store.search.return_value = build_search_results(
             documents=["Second doc"],
-            metadata=[{"course_title": "Second Course", "lesson_number": 2}]
+            metadata=[{"course_title": "Second Course", "lesson_number": 2}],
         )
 
         # Second execute should replace sources
@@ -333,7 +341,7 @@ class TestCourseSearchToolSourceTracking:
         """Verify each source has title, lesson, and url keys."""
         mock_vector_store.search.return_value = build_search_results(
             documents=["Content"],
-            metadata=[{"course_title": "Test", "lesson_number": 1}]
+            metadata=[{"course_title": "Test", "lesson_number": 1}],
         )
 
         tool = CourseSearchTool(mock_vector_store)
