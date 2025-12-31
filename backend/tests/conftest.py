@@ -351,3 +351,53 @@ def mock_session_manager():
     mock_sm.get_conversation_history.return_value = "User: Hello\nAssistant: Hi there!"
     mock_sm.add_exchange.return_value = None
     return mock_sm
+
+
+# =============================================================================
+# API Test Fixtures
+# =============================================================================
+
+@pytest.fixture
+def mock_rag_system():
+    """Mock RAGSystem for API testing."""
+    mock_rag = MagicMock()
+    mock_rag.query.return_value = (
+        "This is a test response about course content.",
+        [{"title": "Test Course", "lesson": 1, "url": "https://example.com/lesson/1"}]
+    )
+    mock_rag.get_course_analytics.return_value = {
+        "total_courses": 3,
+        "course_titles": ["Course A", "Course B", "Course C"]
+    }
+    mock_rag.session_manager = MagicMock()
+    mock_rag.session_manager.create_session.return_value = "test_session_123"
+    return mock_rag
+
+
+@pytest.fixture
+def mock_rag_system_error():
+    """Mock RAGSystem that raises errors for error handling tests."""
+    mock_rag = MagicMock()
+    mock_rag.query.side_effect = Exception("Internal RAG system error")
+    mock_rag.get_course_analytics.side_effect = Exception("Failed to get analytics")
+    mock_rag.session_manager = MagicMock()
+    mock_rag.session_manager.create_session.return_value = "test_session_123"
+    return mock_rag
+
+
+@pytest.fixture
+def sample_query_request():
+    """Sample query request data."""
+    return {
+        "query": "What is machine learning?",
+        "session_id": None
+    }
+
+
+@pytest.fixture
+def sample_query_request_with_session():
+    """Sample query request with session ID."""
+    return {
+        "query": "Tell me more about neural networks",
+        "session_id": "existing_session_456"
+    }
